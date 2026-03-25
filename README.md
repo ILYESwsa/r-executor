@@ -1,39 +1,69 @@
-# SafeScriptStudio (WPF)
+# Discord OAuth2 Electron Desktop App
 
-A dark-themed WPF script workspace UI with local-only actions.
+## Project Structure
 
-## Features
-- Sidebar layout inspired by modern editor dashboards.
-- Script list panel with sample entries.
-- Multi-tab script editing area.
-- `RUN LOCAL` button updates status text.
-- `SAVE` button writes script files to `Documents/SafeScriptStudio`.
-- `INJECT TO TERMINAL` now supports two safe modes:
-  - **Pipe mode**: sends extracted `print(...)` messages to **Safe Script Terminal** via named pipe.
-  - **Plugin DLL mode**: loads local `SafeScriptPlugin.dll` and calls `SafeScriptPlugin.Entry.Execute(string script)` then forwards its result to terminal.
+- `package.json`
+- `package-lock.json`
+- `.env.example`
+- `.gitignore`
+- `env-loader.js`
+- `server.js`
+- `main.js`
+- `.github/workflows/build.yml`
 
-## Build locally
+## Environment Variables
+
+Create a `.env` file and set:
+
+- `CLIENT_ID`
+- `CLIENT_SECRET`
+- `REDIRECT_URI`
+- `SESSION_SECRET`
+- `PORT` (optional, defaults to `3000`)
+
+Supported `.env` lookup order:
+
+1. `DOTENV_PATH` (if set)
+2. current working directory (`.env`)
+3. app directory (`.env`)
+4. executable directory (`.env`)
+
+## Discord App Setup
+
+1. Open: https://discord.com/developers/applications
+2. Create an application.
+3. In OAuth2 settings, add redirect URL:
+   - `http://localhost:3000/callback`
+4. Copy Client ID and Client Secret into `.env`.
+
+## Local Start
+
 ```bash
-dotnet restore SafeScriptStudio.sln
-dotnet build SafeScriptStudio/SafeScriptStudio.csproj -c Release
-dotnet build SafeTerminalHost/SafeTerminalHost.csproj -c Release
+npm start
 ```
 
-## Build EXE in GitHub Actions
-The workflow `.github/workflows/build-wpf.yml` publishes:
-- `SafeScriptStudio.exe` (WPF GUI)
-- `SafeTerminalHost.exe` (terminal companion)
-- `SafeScriptPlugin.dll` (plugin for **Plugin DLL mode**, included by default)
+- Electron launches.
+- Express server starts automatically.
+- App opens at `http://localhost:3000`.
+- User must authenticate with Discord before reaching `/app`.
 
-All outputs are uploaded in artifact `SafeScriptStudio-win-x64`.
+## Build
 
+```bash
+npm run build
+```
 
-## Troubleshooting
-- If `SafeScriptStudio.exe` does not open, check log file: `%LocalAppData%\SafeScriptStudio\logs\app.log`.
-- Ensure `SafeTerminalHost.exe` is next to `SafeScriptStudio.exe` in the same folder when using `INJECT TO TERMINAL`.
+- Uses `electron-builder`
+- Produces a Windows **portable** executable in `dist/`
 
+## GitHub Actions
 
-## Plugin DLL mode contract
-- `SafeScriptPlugin.dll` is included in the CI artifact by default. If missing, place it next to `SafeScriptStudio.exe`.
-- Provide a public static method: `string SafeScriptPlugin.Entry.Execute(string script)`.
-- This is local plugin loading only (not process injection).
+Workflow file: `.github/workflows/build.yml`
+
+On every push, it:
+
+1. Runs on `windows-latest`
+2. Installs Node.js 18
+3. Runs `npm install`
+4. Runs `npm run build` with `GH_TOKEN` explicitly empty
+5. Uploads `dist/` as an artifact

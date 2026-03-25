@@ -26,7 +26,7 @@ jobs:
       - name: Build Windows package
         run: npm run build
         env:
-          # Disable publishing to GitHub to avoid GH_TOKEN requirement
+          # Prevent electron-builder from trying to publish
           GH_TOKEN: ""
 
       # Step 5: Upload dist artifact

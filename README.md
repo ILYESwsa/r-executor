@@ -1,6 +1,6 @@
 # DiscordOAuthWpf (WPF + WebView2)
 
-Windows-only desktop app using C#/.NET WPF with Discord OAuth2 authentication via WebView2.
+Windows-only desktop app using C#/.NET WPF with Discord OAuth2 authentication via WebView2. After successful login, the UI switches to a native WPF authenticated view (WebView is hidden).
 
 ## Project Structure
 
@@ -38,6 +38,8 @@ Do not commit secrets.
 ```bash
 dotnet run --project DiscordOAuthWpf.csproj
 ```
+
+If login succeeds, the embedded browser is hidden and account details are shown in native WPF controls.
 
 ## Build Single EXE
 

@@ -1,6 +1,6 @@
-# DiscordOAuthWpf (WPF + WebView2)
+# Mega Windows Performance Tweaks Utility (WPF + WebView2)
 
-Windows-only desktop app using C#/.NET WPF with Discord OAuth2 authentication via WebView2. After successful login, the UI switches to a modern native WPF dashboard view (WebView is hidden).
+Windows-only desktop app using C#/.NET WPF with Discord OAuth2 authentication via WebView2. After successful login, the app switches to a native tweak utility interface (WebView is hidden).
 
 ## Project Structure
 
@@ -10,6 +10,7 @@ Windows-only desktop app using C#/.NET WPF with Discord OAuth2 authentication vi
 - `MainWindow.xaml`
 - `MainWindow.xaml.cs`
 - `DiscordOAuthHandler.cs`
+- `WindowsTweaksService.cs`
 - `.env.example`
 - `.github/workflows/build.yml`
 
@@ -39,7 +40,7 @@ Do not commit secrets.
 dotnet run --project DiscordOAuthWpf.csproj
 ```
 
-If login succeeds, the embedded browser is hidden and account details are shown in a native dashboard-style WPF layout with post-auth Windows tweak controls.
+If login succeeds, the embedded browser is hidden and account details are shown in a native tweak utility layout. Tweak actions become available only after authentication.
 
 ## Build Single EXE
 

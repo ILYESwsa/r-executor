@@ -1,0 +1,30 @@
+name: Build WPF EXE
+
+on:
+  push:
+
+jobs:
+  build:
+    runs-on: windows-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: 8.0.x
+
+      - name: Restore
+        run: dotnet restore DiscordOAuthWpf.csproj
+
+      - name: Publish single-file EXE
+        run: dotnet publish DiscordOAuthWpf.csproj -c Release -r win-x64 -p:PublishSingleFile=true -p:SelfContained=true -o dist
+
+      - name: Upload artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: DiscordOAuthWpf-win-x64
+          path: dist/
+          if-no-files-found: error

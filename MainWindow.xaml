@@ -1,0 +1,189 @@
+<Window x:Class="DiscordOAuthWpf.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:wv2="clr-namespace:Microsoft.Web.WebView2.Wpf;assembly=Microsoft.Web.WebView2.Wpf"
+        mc:Ignorable="d"
+        Title="Discord OAuth Desktop"
+        Height="760"
+        Width="1220"
+        MinHeight="680"
+        MinWidth="980"
+        WindowStartupLocation="CenterScreen"
+        Background="#060B17"
+        Foreground="#E2E8F0">
+  <Window.Resources>
+    <LinearGradientBrush x:Key="AppBackground" StartPoint="0,0" EndPoint="1,1">
+      <GradientStop Color="#0A1328" Offset="0"/>
+      <GradientStop Color="#060B17" Offset="1"/>
+    </LinearGradientBrush>
+
+    <Style x:Key="PrimaryButton" TargetType="Button">
+      <Setter Property="Background" Value="#3366FF"/>
+      <Setter Property="Foreground" Value="White"/>
+      <Setter Property="BorderBrush" Value="#5E85FF"/>
+      <Setter Property="BorderThickness" Value="1"/>
+      <Setter Property="Padding" Value="16,9"/>
+      <Setter Property="FontWeight" Value="SemiBold"/>
+      <Setter Property="Cursor" Value="Hand"/>
+      <Setter Property="Template">
+        <Setter.Value>
+          <ControlTemplate TargetType="Button">
+            <Border Background="{TemplateBinding Background}" BorderBrush="{TemplateBinding BorderBrush}" BorderThickness="{TemplateBinding BorderThickness}" CornerRadius="10">
+              <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center"/>
+            </Border>
+          </ControlTemplate>
+        </Setter.Value>
+      </Setter>
+      <Style.Triggers>
+        <Trigger Property="IsMouseOver" Value="True">
+          <Setter Property="Background" Value="#4D77FF"/>
+        </Trigger>
+      </Style.Triggers>
+    </Style>
+
+    <Style x:Key="PanelCard" TargetType="Border">
+      <Setter Property="CornerRadius" Value="12"/>
+      <Setter Property="BorderBrush" Value="#2A3657"/>
+      <Setter Property="BorderThickness" Value="1"/>
+      <Setter Property="Background" Value="#111B31"/>
+    </Style>
+  </Window.Resources>
+
+  <Grid Margin="16">
+    <Border CornerRadius="14" BorderBrush="#314169" BorderThickness="1" Background="{StaticResource AppBackground}">
+      <Grid>
+        <Grid.RowDefinitions>
+          <RowDefinition Height="66"/>
+          <RowDefinition Height="*"/>
+          <RowDefinition Height="Auto"/>
+        </Grid.RowDefinitions>
+
+        <Grid Grid.Row="0" Background="#1A2542">
+          <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="280"/>
+            <ColumnDefinition Width="*"/>
+            <ColumnDefinition Width="Auto"/>
+          </Grid.ColumnDefinitions>
+
+          <TextBlock Grid.Column="0" Text="DISCORD APP" Margin="20,0,0,0" VerticalAlignment="Center" FontSize="34" FontWeight="Bold" Foreground="#BBD0FF"/>
+          <TextBlock Grid.Column="1" Text="Dashboard" VerticalAlignment="Center" FontSize="30" FontWeight="SemiBold" Foreground="#F8FAFC"/>
+
+          <Border Grid.Column="2" Margin="0,14,18,14" Padding="16,6" Background="#101A2F" CornerRadius="20" BorderBrush="#2D3F63" BorderThickness="1">
+            <TextBlock x:Name="TopUserBadge" Text="Not authenticated" VerticalAlignment="Center" Foreground="#D7E3FF" FontWeight="SemiBold"/>
+          </Border>
+        </Grid>
+
+        <Grid Grid.Row="1">
+          <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="280"/>
+            <ColumnDefinition Width="*"/>
+          </Grid.ColumnDefinitions>
+
+          <Border Grid.Column="0" Background="#0E1730" BorderBrush="#2A3657" BorderThickness="0,1,1,0">
+            <StackPanel Margin="14,14,14,14">
+              <Button Content="Dashboard" Style="{StaticResource PrimaryButton}" Height="48" Margin="0,0,0,10"/>
+              <Button Content="Servers" Height="44" Margin="0,0,0,8" Background="#1A2542" Foreground="#D6E2FF" BorderBrush="#2E3E61" BorderThickness="1"/>
+              <Button Content="Users" Height="44" Margin="0,0,0,8" Background="#1A2542" Foreground="#D6E2FF" BorderBrush="#2E3E61" BorderThickness="1"/>
+              <Button Content="Settings" Height="44" Margin="0,0,0,8" Background="#1A2542" Foreground="#D6E2FF" BorderBrush="#2E3E61" BorderThickness="1"/>
+              <Button Content="Logs" Height="44" Background="#1A2542" Foreground="#D6E2FF" BorderBrush="#2E3E61" BorderThickness="1"/>
+            </StackPanel>
+          </Border>
+
+          <Grid Grid.Column="1" Margin="14">
+            <Border x:Name="WebViewContainer" Style="{StaticResource PanelCard}">
+              <Grid>
+                <Grid.RowDefinitions>
+                  <RowDefinition Height="Auto"/>
+                  <RowDefinition Height="*"/>
+                </Grid.RowDefinitions>
+
+                <DockPanel Margin="14,12,14,10">
+                  <Button x:Name="LoginButton"
+                          Style="{StaticResource PrimaryButton}"
+                          Content="Login with Discord"
+                          Width="190"
+                          Height="38"
+                          Click="LoginButton_Click"
+                          Margin="0,0,12,0" />
+                  <TextBlock x:Name="UserText" VerticalAlignment="Center" Foreground="#A5B4FC" FontWeight="SemiBold" Text="Not authenticated"/>
+                </DockPanel>
+
+                <Border Grid.Row="1" Margin="14,0,14,14" BorderBrush="#2A3657" BorderThickness="1" CornerRadius="10" Background="#0D1528">
+                  <wv2:WebView2 x:Name="OAuthWebView" />
+                </Border>
+              </Grid>
+            </Border>
+
+            <Grid x:Name="NativeContentContainer" Visibility="Collapsed">
+              <Grid.RowDefinitions>
+                <RowDefinition Height="1.15*"/>
+                <RowDefinition Height="1*"/>
+              </Grid.RowDefinitions>
+              <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="1.1*"/>
+                <ColumnDefinition Width="0.95*"/>
+              </Grid.ColumnDefinitions>
+
+              <Border Grid.Row="0" Grid.Column="0" Style="{StaticResource PanelCard}" Margin="0,0,12,12" Padding="22">
+                <StackPanel>
+                  <TextBlock Text="Welcome" FontSize="32" FontWeight="Bold" Foreground="#EEF2FF"/>
+                  <TextBlock x:Name="UsernameValue" Text="Username: -" Margin="0,10,0,8" FontSize="18" FontWeight="SemiBold" Foreground="#CBD5E1"/>
+                  <TextBlock x:Name="UserIdValue" Text="Discord ID: -" FontSize="16" Foreground="#93A4C9"/>
+
+                  <Border Width="112" Height="112" CornerRadius="56" BorderBrush="#41598E" BorderThickness="1" Margin="0,18,0,0" HorizontalAlignment="Left">
+                    <Image x:Name="AvatarImage" Width="104" Height="104" Margin="4"/>
+                  </Border>
+                </StackPanel>
+              </Border>
+
+              <Border Grid.Row="0" Grid.Column="1" Style="{StaticResource PanelCard}" Margin="0,0,0,12" Padding="22">
+                <StackPanel>
+                  <TextBlock Text="Your Servers" FontSize="30" FontWeight="Bold" Foreground="#EEF2FF"/>
+                  <TextBlock Text="5 Servers Joined" Margin="0,12,0,10" FontSize="18" FontWeight="SemiBold" Foreground="#63E6FF"/>
+                  <TextBlock Text="• Gaming Hub" FontSize="18" Margin="0,4,0,0"/>
+                  <TextBlock Text="• Music Lounge" FontSize="18" Margin="0,4,0,0"/>
+                  <TextBlock Text="• Dev Community" FontSize="18" Margin="0,4,0,0"/>
+                  <TextBlock Text="• Streamer's Den" FontSize="18" Margin="0,4,0,0"/>
+                </StackPanel>
+              </Border>
+
+              <Border Grid.Row="1" Grid.Column="0" Style="{StaticResource PanelCard}" Margin="0,0,12,0" Padding="22">
+                <StackPanel>
+                  <TextBlock Text="Recent Activity" FontSize="30" FontWeight="Bold" Foreground="#EEF2FF" Margin="0,0,0,10"/>
+                  <TextBlock Text="• OAuth Login Successful" FontSize="17" Foreground="#BDFE68" Margin="0,6,0,0"/>
+                  <TextBlock Text="• Token Refreshed" FontSize="17" Foreground="#BDFE68" Margin="0,6,0,0"/>
+                  <TextBlock Text="• Settings Updated" FontSize="17" Foreground="#BDFE68" Margin="0,6,0,0"/>
+                  <TextBlock Text="• Profile Synced" FontSize="17" Foreground="#BDFE68" Margin="0,6,0,0"/>
+                </StackPanel>
+              </Border>
+
+              <Border Grid.Row="1" Grid.Column="1" Style="{StaticResource PanelCard}" Padding="22">
+                <Grid>
+                  <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="*"/>
+                  </Grid.RowDefinitions>
+
+                  <TextBlock Text="Quick Actions" FontSize="30" FontWeight="Bold" Foreground="#EEF2FF"/>
+
+                  <UniformGrid Grid.Row="1" Rows="2" Columns="2" Margin="0,14,0,0">
+                    <Button Content="Refresh" Style="{StaticResource PrimaryButton}" Margin="0,0,8,8" Click="RefreshButton_Click"/>
+                    <Button Content="Open Server" Background="#1B2D4D" Foreground="#DDE7FF" BorderBrush="#3B4F7A" BorderThickness="1" Margin="8,0,0,8" Click="OpenServerButton_Click"/>
+                    <Button Content="Copy ID" Background="#1B2D4D" Foreground="#DDE7FF" BorderBrush="#3B4F7A" BorderThickness="1" Margin="0,8,8,0" Click="CopyIdButton_Click"/>
+                    <Button Content="Log Out" Background="#4D1E2A" Foreground="#FFD7DF" BorderBrush="#744155" BorderThickness="1" Margin="8,8,0,0" Click="LogoutButton_Click"/>
+                  </UniformGrid>
+                </Grid>
+              </Border>
+            </Grid>
+          </Grid>
+        </Grid>
+
+        <Border Grid.Row="2" Margin="14,0,14,14" Background="#0A152C" CornerRadius="10" Padding="12,10">
+          <TextBlock x:Name="StatusText" Foreground="#93C5FD" Text="Ready" TextWrapping="Wrap" />
+        </Border>
+      </Grid>
+    </Border>
+  </Grid>
+</Window>

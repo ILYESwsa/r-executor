@@ -1,39 +1,54 @@
-# SafeScriptStudio (WPF)
+# DiscordOAuthWpf (WPF + WebView2)
 
-A dark-themed WPF script workspace UI with local-only actions.
+Windows-only desktop app using C#/.NET WPF with Discord OAuth2 authentication via WebView2. After successful login, the UI switches to a modern native WPF dashboard view (WebView is hidden).
 
-## Features
-- Sidebar layout inspired by modern editor dashboards.
-- Script list panel with sample entries.
-- Multi-tab script editing area.
-- `RUN LOCAL` button updates status text.
-- `SAVE` button writes script files to `Documents/SafeScriptStudio`.
-- `INJECT TO TERMINAL` now supports two safe modes:
-  - **Pipe mode**: sends extracted `print(...)` messages to **Safe Script Terminal** via named pipe.
-  - **Plugin DLL mode**: loads local `SafeScriptPlugin.dll` and calls `SafeScriptPlugin.Entry.Execute(string script)` then forwards its result to terminal.
+## Project Structure
 
-## Build locally
-```bash
-dotnet restore SafeScriptStudio.sln
-dotnet build SafeScriptStudio/SafeScriptStudio.csproj -c Release
-dotnet build SafeTerminalHost/SafeTerminalHost.csproj -c Release
+- `DiscordOAuthWpf.csproj`
+- `App.xaml`
+- `App.xaml.cs`
+- `MainWindow.xaml`
+- `MainWindow.xaml.cs`
+- `DiscordOAuthHandler.cs`
+- `.env.example`
+- `.github/workflows/build.yml`
+
+## Environment Variables
+
+Create `.env` in the project root:
+
+```env
+CLIENT_ID=your_discord_client_id
+CLIENT_SECRET=your_discord_client_secret
+REDIRECT_URI=http://localhost:3000/callback
+SESSION_SECRET=replace_with_a_long_random_string
 ```
 
-## Build EXE in GitHub Actions
-The workflow `.github/workflows/build-wpf.yml` publishes:
-- `SafeScriptStudio.exe` (WPF GUI)
-- `SafeTerminalHost.exe` (terminal companion)
-- `SafeScriptPlugin.dll` (plugin for **Plugin DLL mode**, included by default)
+Do not commit secrets.
 
-All outputs are uploaded in artifact `SafeScriptStudio-win-x64`.
+## Discord App Setup
 
+1. Open Discord Developer Portal: https://discord.com/developers/applications
+2. Create app and configure OAuth2 redirect URL:
+   - `http://localhost:3000/callback`
+3. Copy client credentials into `.env`.
 
-## Troubleshooting
-- If `SafeScriptStudio.exe` does not open, check log file: `%LocalAppData%\SafeScriptStudio\logs\app.log`.
-- Ensure `SafeTerminalHost.exe` is next to `SafeScriptStudio.exe` in the same folder when using `INJECT TO TERMINAL`.
+## Local Run
 
+```bash
+dotnet run --project DiscordOAuthWpf.csproj
+```
 
-## Plugin DLL mode contract
-- `SafeScriptPlugin.dll` is included in the CI artifact by default. If missing, place it next to `SafeScriptStudio.exe`.
-- Provide a public static method: `string SafeScriptPlugin.Entry.Execute(string script)`.
-- This is local plugin loading only (not process injection).
+If login succeeds, the embedded browser is hidden and account details are shown in a native dashboard-style WPF layout.
+
+## Build Single EXE
+
+```bash
+dotnet publish DiscordOAuthWpf.csproj -c Release -r win-x64 -p:PublishSingleFile=true -p:SelfContained=true -o dist
+```
+
+## GitHub Actions
+
+Workflow builds on `windows-latest`, publishes single-file EXE, and uploads `dist/` artifact.
+
+Release publish enables single-file compression (trimming is intentionally disabled because WPF publish with trimming fails with NETSDK1168).

@@ -50,3 +50,5 @@ dotnet publish DiscordOAuthWpf.csproj -c Release -r win-x64 -p:PublishSingleFile
 ## GitHub Actions
 
 Workflow builds on `windows-latest`, publishes single-file EXE, and uploads `dist/` artifact.
+
+Release publish also enables single-file compression and partial trimming to reduce output size.

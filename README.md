@@ -51,4 +51,4 @@ dotnet publish DiscordOAuthWpf.csproj -c Release -r win-x64 -p:PublishSingleFile
 
 Workflow builds on `windows-latest`, publishes single-file EXE, and uploads `dist/` artifact.
 
-Release publish also enables single-file compression and partial trimming to reduce output size.
+Release publish enables single-file compression (trimming is intentionally disabled because WPF publish with trimming fails with NETSDK1168).

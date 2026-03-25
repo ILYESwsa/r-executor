@@ -1,39 +1,74 @@
-# SafeScriptStudio (WPF)
+# Discord OAuth2 Electron Desktop App
 
-A dark-themed WPF script workspace UI with local-only actions.
+## Project Structure
 
-## Features
-- Sidebar layout inspired by modern editor dashboards.
-- Script list panel with sample entries.
-- Multi-tab script editing area.
-- `RUN LOCAL` button updates status text.
-- `SAVE` button writes script files to `Documents/SafeScriptStudio`.
-- `INJECT TO TERMINAL` now supports two safe modes:
-  - **Pipe mode**: sends extracted `print(...)` messages to **Safe Script Terminal** via named pipe.
-  - **Plugin DLL mode**: loads local `SafeScriptPlugin.dll` and calls `SafeScriptPlugin.Entry.Execute(string script)` then forwards its result to terminal.
+- `package.json`
+- `main.js` (Electron entry)
+- `server.js` (Express backend + Discord OAuth2)
+- `.env.example`
+- `.github/workflows/build.yml`
 
-## Build locally
+## Setup
+
+1. Install Node.js 18+
+2. Install dependencies:
+
 ```bash
-dotnet restore SafeScriptStudio.sln
-dotnet build SafeScriptStudio/SafeScriptStudio.csproj -c Release
-dotnet build SafeTerminalHost/SafeTerminalHost.csproj -c Release
+npm install
 ```
 
-## Build EXE in GitHub Actions
-The workflow `.github/workflows/build-wpf.yml` publishes:
-- `SafeScriptStudio.exe` (WPF GUI)
-- `SafeTerminalHost.exe` (terminal companion)
-- `SafeScriptPlugin.dll` (plugin for **Plugin DLL mode**, included by default)
+3. Create `.env` from `.env.example`:
 
-All outputs are uploaded in artifact `SafeScriptStudio-win-x64`.
+```bash
+cp .env.example .env
+```
 
+4. Fill in values:
 
-## Troubleshooting
-- If `SafeScriptStudio.exe` does not open, check log file: `%LocalAppData%\SafeScriptStudio\logs\app.log`.
-- Ensure `SafeTerminalHost.exe` is next to `SafeScriptStudio.exe` in the same folder when using `INJECT TO TERMINAL`.
+- `CLIENT_ID`
+- `CLIENT_SECRET`
+- `REDIRECT_URI`
+- `SESSION_SECRET`
+- `PORT` (optional, default `3000`)
 
+## Create Discord Application
 
-## Plugin DLL mode contract
-- `SafeScriptPlugin.dll` is included in the CI artifact by default. If missing, place it next to `SafeScriptStudio.exe`.
-- Provide a public static method: `string SafeScriptPlugin.Entry.Execute(string script)`.
-- This is local plugin loading only (not process injection).
+1. Open Discord Developer Portal: https://discord.com/developers/applications
+2. Create a new application.
+3. Go to **OAuth2** settings.
+4. Add redirect URL:
+   - `http://localhost:3000/callback`
+5. Copy **Client ID** and **Client Secret** into `.env`.
+
+## Run Locally
+
+```bash
+npm start
+```
+
+This starts Electron, launches the local Express server, opens `http://localhost:3000`, and requires Discord login before access.
+
+## Build Windows .exe Locally
+
+```bash
+npm run build
+```
+
+Output is generated in `dist/`.
+
+## GitHub Actions Build
+
+On every push, workflow `.github/workflows/build.yml`:
+
+1. Runs on `windows-latest`
+2. Installs Node.js 18
+3. Runs `npm install`
+4. Runs `npm run build`
+5. Uploads `.exe` from `dist/` as artifact
+
+## Download .exe from GitHub Actions
+
+1. Push code to GitHub.
+2. Open repository **Actions** tab.
+3. Open latest successful **Build Windows EXE** run.
+4. Download artifact named **windows-exe**.

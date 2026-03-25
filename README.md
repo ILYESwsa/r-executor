@@ -1,69 +1,50 @@
-# Discord OAuth2 Electron Desktop App
+# DiscordOAuthWpf (WPF + WebView2)
+
+Windows-only desktop app using C#/.NET WPF with Discord OAuth2 authentication via WebView2.
 
 ## Project Structure
 
-- `package.json`
-- `package-lock.json`
+- `DiscordOAuthWpf.csproj`
+- `App.xaml`
+- `App.xaml.cs`
+- `MainWindow.xaml`
+- `MainWindow.xaml.cs`
+- `DiscordOAuthHandler.cs`
 - `.env.example`
-- `.gitignore`
-- `env-loader.js`
-- `server.js`
-- `main.js`
 - `.github/workflows/build.yml`
 
 ## Environment Variables
 
-Create a `.env` file and set:
+Create `.env` in the project root:
 
-- `CLIENT_ID`
-- `CLIENT_SECRET`
-- `REDIRECT_URI`
-- `SESSION_SECRET`
-- `PORT` (optional, defaults to `3000`)
+```env
+CLIENT_ID=your_discord_client_id
+CLIENT_SECRET=your_discord_client_secret
+REDIRECT_URI=http://localhost:3000/callback
+SESSION_SECRET=replace_with_a_long_random_string
+```
 
-Supported `.env` lookup order:
-
-1. `DOTENV_PATH` (if set)
-2. current working directory (`.env`)
-3. app directory (`.env`)
-4. executable directory (`.env`)
+Do not commit secrets.
 
 ## Discord App Setup
 
-1. Open: https://discord.com/developers/applications
-2. Create an application.
-3. In OAuth2 settings, add redirect URL:
+1. Open Discord Developer Portal: https://discord.com/developers/applications
+2. Create app and configure OAuth2 redirect URL:
    - `http://localhost:3000/callback`
-4. Copy Client ID and Client Secret into `.env`.
+3. Copy client credentials into `.env`.
 
-## Local Start
-
-```bash
-npm start
-```
-
-- Electron launches.
-- Express server starts automatically.
-- App opens at `http://localhost:3000`.
-- User must authenticate with Discord before reaching `/app`.
-
-## Build
+## Local Run
 
 ```bash
-npm run build
+dotnet run --project DiscordOAuthWpf.csproj
 ```
 
-- Uses `electron-builder`
-- Produces a Windows **portable** executable in `dist/`
+## Build Single EXE
+
+```bash
+dotnet publish DiscordOAuthWpf.csproj -c Release -r win-x64 -p:PublishSingleFile=true -p:SelfContained=true -o dist
+```
 
 ## GitHub Actions
 
-Workflow file: `.github/workflows/build.yml`
-
-On every push, it:
-
-1. Runs on `windows-latest`
-2. Installs Node.js 18
-3. Runs `npm install`
-4. Runs `npm run build` with `GH_TOKEN` explicitly empty
-5. Uploads `dist/` as an artifact
+Workflow builds on `windows-latest`, publishes single-file EXE, and uploads `dist/` artifact.

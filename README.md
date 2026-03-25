@@ -39,7 +39,7 @@ Do not commit secrets.
 dotnet run --project DiscordOAuthWpf.csproj
 ```
 
-If login succeeds, the embedded browser is hidden and account details are shown in a native dashboard-style WPF layout.
+If login succeeds, the embedded browser is hidden and account details are shown in a native dashboard-style WPF layout with post-auth Windows tweak controls.
 
 ## Build Single EXE
 
